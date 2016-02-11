@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx;
 
 import java.util.Arrays;
 
-import com.tetris.abmy.GameWorld;
-import com.tetris.abmy.WorldController;
+import com.tetris.abmy.TetrominoManager;
+import com.tetris.abmy.TetrisController;
 
 /**
  * Created by team AMBY | Insta project on 11-02-16.
@@ -58,8 +58,8 @@ public class Tetromino {
 
     public int posX;
     public int posY;
-    private GameWorld gameWorld;
-    private WorldController worldController;
+    private TetrominoManager gameWorld;
+    private TetrisController worldController;
     public boolean moved;
 
     public boolean isFalling() {
@@ -72,7 +72,7 @@ public class Tetromino {
 
     public long lastFallTime;
 
-    public Tetromino(GameWorld gameWorld, WorldController worldController) {
+    public Tetromino(TetrominoManager gameWorld, TetrisController worldController) {
         this.gameWorld = gameWorld;
         this.worldController = worldController;
 
