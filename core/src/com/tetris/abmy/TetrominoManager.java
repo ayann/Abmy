@@ -9,9 +9,9 @@ import com.tetris.abmy.objects.Tetromino;
 /**
  * Created by team AMBY | Insta project on 11-02-16.
  */
-public class GameWorld {
+public class TetrominoManager {
 
-    public static final String TAG = GameWorld.class.getName();
+    public static final String TAG = TetrominoManager.class.getName();
     public int[][] playfield = new int[22][10]; //used for rendering
     public boolean[][] blocks = new boolean[22][10];  // used for object detection
 

@@ -25,12 +25,12 @@ import com.tetris.abmy.objects.Tetromino;
 /**
  * Created by team AMBY | Insta project on 11-02-16.
  */
-public class WorldController {
+public class TetrisController {
 
     private final TetrisGame game;
-    private String TAG = WorldController.class.getName();
+    private String TAG = TetrisController.class.getName();
 
-    private GameWorld gameWorld;
+    private TetrominoManager tetrominoManager;
     public boolean tetrominoSpawned = false;
     private Tetromino tetromino;
     public GameState gameState;
@@ -43,9 +43,9 @@ public class WorldController {
     private float winScaleFactor;
 
 
-    public WorldController(TetrisGame game, GameWorld gameWorld) {
+    public TetrisController(TetrisGame game, TetrominoManager tetrominoManager) {
         this.game = game;
-        this.gameWorld = gameWorld;
+        this.tetrominoManager = tetrominoManager;
         init();
     }
 
@@ -55,8 +55,8 @@ public class WorldController {
         prefs = Gdx.app.getPreferences("Nitris");
 
         gameState = GameState.Start;
-        tetromino = new Tetromino(gameWorld, this);
-        nextTetromino = new Tetromino(gameWorld, this);
+        tetromino = new Tetromino(tetrominoManager, this);
+        nextTetromino = new Tetromino(tetrominoManager, this);
         levelRowsRemoved = 0;
 
         windowStage = new Stage();
@@ -166,43 +166,43 @@ public class WorldController {
                     tetromino.fall(true);
                     moved = true;
                 }
-                if (Gdx.input.justTouched() && game.worldRenderer != null) {
+                if (Gdx.input.justTouched() && game.tetrisView != null) {
                     int gx = Gdx.input.getX();
                     int gy = Gdx.input.getY();
-                    if (gx > game.worldRenderer.leftArrowScreenX &&
-                            gx < game.worldRenderer.leftArrowScreenX + game.worldRenderer.controlScreenWidth &&
-                            gy > game.worldRenderer.leftArrowScreenY &&
-                            gy < game.worldRenderer.leftArrowScreenY +  game.worldRenderer.controlScreenWidth) {
+                    if (gx > game.tetrisView.leftArrowScreenX &&
+                            gx < game.tetrisView.leftArrowScreenX + game.tetrisView.controlScreenWidth &&
+                            gy > game.tetrisView.leftArrowScreenY &&
+                            gy < game.tetrisView.leftArrowScreenY +  game.tetrisView.controlScreenWidth) {
                         tetromino.move(-1, 0);
                         moved = true;
-                    } else if (gx > game.worldRenderer.rightArrowScreenX &&
-                            gx < game.worldRenderer.rightArrowScreenX +  game.worldRenderer.controlScreenWidth &&
-                            gy > game.worldRenderer.rightArrowScreenY &&
-                            gy < game.worldRenderer.rightArrowScreenY +  game.worldRenderer.controlScreenWidth) {
+                    } else if (gx > game.tetrisView.rightArrowScreenX &&
+                            gx < game.tetrisView.rightArrowScreenX +  game.tetrisView.controlScreenWidth &&
+                            gy > game.tetrisView.rightArrowScreenY &&
+                            gy < game.tetrisView.rightArrowScreenY +  game.tetrisView.controlScreenWidth) {
                         tetromino.move(1, 0);
                         moved = true;
-                    } else if (gx > game.worldRenderer.rotateArrowScreenX &&
-                            gx < game.worldRenderer.rotateArrowScreenY +  game.worldRenderer.controlScreenWidth &&
-                            gy > game.worldRenderer.rotateArrowScreenY &&
-                            gy < game.worldRenderer.rotateArrowScreenY +  game.worldRenderer.controlScreenWidth) {
+                    } else if (gx > game.tetrisView.rotateArrowScreenX &&
+                            gx < game.tetrisView.rotateArrowScreenY +  game.tetrisView.controlScreenWidth &&
+                            gy > game.tetrisView.rotateArrowScreenY &&
+                            gy < game.tetrisView.rotateArrowScreenY +  game.tetrisView.controlScreenWidth) {
                         tetromino.rotate();
                         moved = true;
                     }
                 }
-                if ((Gdx.input.justTouched() || Gdx.input.isTouched()) && game.worldRenderer != null) {
+                if ((Gdx.input.justTouched() || Gdx.input.isTouched()) && game.tetrisView != null) {
                     int gx = Gdx.input.getX();
                     int gy = Gdx.input.getY();
-                    if (gx > game.worldRenderer.downArrowScreenX &&
-                            gx < game.worldRenderer.downArrowScreenX +  game.worldRenderer.controlScreenWidth &&
-                            gy > game.worldRenderer.downArrowScreenY &&
-                            gy < game.worldRenderer.downArrowScreenY + game.worldRenderer.controlScreenWidth) {
+                    if (gx > game.tetrisView.downArrowScreenX &&
+                            gx < game.tetrisView.downArrowScreenX +  game.tetrisView.controlScreenWidth &&
+                            gy > game.tetrisView.downArrowScreenY &&
+                            gy < game.tetrisView.downArrowScreenY + game.tetrisView.controlScreenWidth) {
                         tetromino.fall(true);
                         moved = true;
                     }
                 }
                 if (!moved)
                     tetromino.fall(false);
-                gameWorld.update(tetromino);
+                tetrominoManager.update(tetromino);
                 break;
             case GameOver:
                 checkMenuControls();
@@ -215,17 +215,17 @@ public class WorldController {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY) || Gdx.input.justTouched()) {
             int gx = Gdx.input.getX();
             int gy = Gdx.input.getY();
-            if (gx > game.worldRenderer.playScreenX &&
-                    gx < game.worldRenderer.playScreenX + game.worldRenderer.controlScreenWidth &&
-                    gy > game.worldRenderer.playScreenY &&
-                    gy < game.worldRenderer.playScreenY + game.worldRenderer.controlScreenWidth) {
-                gameWorld.reset();
+            if (gx > game.tetrisView.playScreenX &&
+                    gx < game.tetrisView.playScreenX + game.tetrisView.controlScreenWidth &&
+                    gy > game.tetrisView.playScreenY &&
+                    gy < game.tetrisView.playScreenY + game.tetrisView.controlScreenWidth) {
+                tetrominoManager.reset();
                 gameState = GameState.Running;
             }
-            if (gx > game.worldRenderer.optionsScreenX &&
-                    gx < game.worldRenderer.optionsScreenX + game.worldRenderer.controlScreenWidth &&
-                    gy > game.worldRenderer.optionsScreenY &&
-                    gy < game.worldRenderer.optionsScreenY + game.worldRenderer.controlScreenWidth) {
+            if (gx > game.tetrisView.optionsScreenX &&
+                    gx < game.tetrisView.optionsScreenX + game.tetrisView.controlScreenWidth &&
+                    gy > game.tetrisView.optionsScreenY &&
+                    gy < game.tetrisView.optionsScreenY + game.tetrisView.controlScreenWidth) {
                 winOptions.setVisible(true);
 
                 Gdx.input.setInputProcessor(windowStage);
@@ -237,13 +237,13 @@ public class WorldController {
         int rowsRemoved = 0;
         if (null == tetromino || System.currentTimeMillis() - tetromino.lastFallTime >= tetromino.delay) {
             boolean checkAgain = false;
-            for (int i = 0; i < gameWorld.blocks.length; i++) {
+            for (int i = 0; i < tetrominoManager.blocks.length; i++) {
                 if (checkAgain) {
                     i -= 1;
                 }
                 boolean full = true;
-                for (int j = 0; j < gameWorld.blocks[0].length; j++) {
-                    if (!gameWorld.blocks[i][j]) {
+                for (int j = 0; j < tetrominoManager.blocks[0].length; j++) {
+                    if (!tetrominoManager.blocks[i][j]) {
                         full = false;
                     }
                 }
@@ -264,37 +264,37 @@ public class WorldController {
 
         switch (rowsRemoved) {
             case 1:
-                gameWorld.score += 40 * (gameWorld.level + 1);
+                tetrominoManager.score += 40 * (tetrominoManager.level + 1);
                 break;
             case 2:
-                gameWorld.score += 100 * (gameWorld.level + 1);
+                tetrominoManager.score += 100 * (tetrominoManager.level + 1);
                 break;
             case 3:
-                gameWorld.score += 300 * (gameWorld.level + 1);
+                tetrominoManager.score += 300 * (tetrominoManager.level + 1);
                 break;
             case 4:
-                gameWorld.score += 1200 * (gameWorld.level + 1);
+                tetrominoManager.score += 1200 * (tetrominoManager.level + 1);
                 break;
         }
         if (levelRowsRemoved >= 10) {
-            gameWorld.level++;
+            tetrominoManager.level++;
             levelRowsRemoved = 0;
             play(Assets.instance.sounds.levelUp);
         }
     }
 
     private void removeRow(int row) {
-        for (int j = 0; j < gameWorld.blocks[0].length; j++) {
-            gameWorld.blocks[row][j] = false;
-            gameWorld.playfield[row][j] = 0;
+        for (int j = 0; j < tetrominoManager.blocks[0].length; j++) {
+            tetrominoManager.blocks[row][j] = false;
+            tetrominoManager.playfield[row][j] = 0;
         }
         for (int i = row; i > 0; i--) {
-            for (int j = 0; j < gameWorld.blocks[0].length; j++) {
-                if (gameWorld.blocks[i - 1][j]) {
-                    gameWorld.blocks[i - 1][j] = false;
-                    gameWorld.blocks[i][j] = true;
-                    gameWorld.playfield[i][j] = gameWorld.playfield[i - 1][j];
-                    gameWorld.playfield[i - 1][j] = 0;
+            for (int j = 0; j < tetrominoManager.blocks[0].length; j++) {
+                if (tetrominoManager.blocks[i - 1][j]) {
+                    tetrominoManager.blocks[i - 1][j] = false;
+                    tetrominoManager.blocks[i][j] = true;
+                    tetrominoManager.playfield[i][j] = tetrominoManager.playfield[i - 1][j];
+                    tetrominoManager.playfield[i - 1][j] = 0;
                 }
             }
         }
@@ -349,7 +349,7 @@ public class WorldController {
     }
 
     public void dispose() {
-        gameWorld.dispose();
+        tetrominoManager.dispose();
         if (skinLibGdx != null) {
             skinLibGdx.dispose();
         }
