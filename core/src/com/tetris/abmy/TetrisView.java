@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -21,14 +22,14 @@ import com.tetris.abmy.objects.Tetromino;
 /**
  * Created by team AMBY | Insta project on 11-02-16.
  */
-public class WorldRenderer implements Disposable {
+public class TetrisView implements Disposable {
 
     private final float gameWidth;
     private final float gameHeight;
     private OrthographicCamera camera;
     private SpriteBatch batch;
-    private WorldController worldController;
-    private GameWorld gameWorld;
+    private TetrisController tetrisController;
+    private TetrominoManager tetromanager;
     private ShapeRenderer shapeRenderer;
 
     public static final int FIELD_MARGIN_LEFT = 20;
@@ -83,9 +84,9 @@ public class WorldRenderer implements Disposable {
     public float rotateArrowScreenX;
     public float rotateArrowScreenY;
 
-    public WorldRenderer(GameWorld gameWorld, WorldController worldController, float gameWidth, float gameHeight) {
-        this.gameWorld = gameWorld;
-        this.worldController = worldController;
+    public TetrisView(TetrominoManager tetromanager, TetrisController tetrisController, float gameWidth, float gameHeight) {
+        this.tetromanager = tetromanager;
+        this.tetrisController = tetrisController;
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
         init();
@@ -183,16 +184,18 @@ public class WorldRenderer implements Disposable {
 
         batch.begin();
 
+        batch.draw(new Texture(Gdx.files.internal("images/main_bg.png")),0,0);
+
         renderPlayfield();
 
-        if (worldController.gameState == WorldController.GameState.Running || worldController.gameState == WorldController.GameState.GameOver)
+        if (tetrisController.gameState == TetrisController.GameState.Running || tetrisController.gameState == TetrisController.GameState.GameOver)
             renderNextTetromino();
 
         renderScore();
 
         renderControls();
 
-        if (worldController.gameState == WorldController.GameState.GameOver) {
+        if (tetrisController.gameState == TetrisController.GameState.GameOver) {
             //float textWidth = gameOverFont.getBounds(GAME_OVER).width;
             //float textHeight = gameOverFont.getBounds(GAME_OVER).height;
             gameOverGlyphLayout.setText(gameOverFont, GAME_OVER);
@@ -215,9 +218,9 @@ public class WorldRenderer implements Disposable {
         fbBatch.draw(frameBuffer.getColorBufferTexture(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0, 0, 1, 1);
         fbBatch.end();
 
-        if (worldController.windowStage != null) {
+        if (tetrisController.windowStage != null) {
 
-            worldController.windowStage.draw();
+            tetrisController.windowStage.draw();
 
         }
 
@@ -225,7 +228,7 @@ public class WorldRenderer implements Disposable {
 
     @SuppressWarnings("SuspiciousNameCombination")
     private void renderControls() {
-        switch (worldController.gameState) {
+        switch (tetrisController.gameState) {
             case Running:
                 batch.draw(Assets.instance.controls.arrowLeft, leftArrowX, leftArrowY, CONTROL_WIDTH, CONTROL_WIDTH);
                 batch.draw(Assets.instance.controls.arrowRight, rightArrowX, rightArrowY, CONTROL_WIDTH, CONTROL_WIDTH);
@@ -251,7 +254,7 @@ public class WorldRenderer implements Disposable {
 
         scoreFont.draw(batch, SCORE, textX, textY);
 
-        String score = String.valueOf(gameWorld.score);
+        String score = String.valueOf(tetromanager.score);
         //textWidth = scoreFont.getBounds(score).width;
         scoreGlyphLayout.setText(scoreFont, score);
         textWidth = scoreGlyphLayout.width;
@@ -266,7 +269,7 @@ public class WorldRenderer implements Disposable {
         textY += textHeight * 2.6f;
         scoreFont.draw(batch, LEVEL, textX, textY);
 
-        String level = String.valueOf(gameWorld.level);
+        String level = String.valueOf(tetromanager.level);
         //textWidth = scoreFont.getBounds(level).width;
         scoreGlyphLayout.setText(scoreFont, level);
         textWidth = scoreGlyphLayout.width;
@@ -277,13 +280,13 @@ public class WorldRenderer implements Disposable {
     }
 
     private void renderNextTetromino() {
-        if (worldController.nextTetromino != null && worldController.nextTetromino.type != 0) {
-            for (int i = 0; i < worldController.nextTetromino.grid.length; i++) {
-                for (int j = 0; j < worldController.nextTetromino.grid[0].length; j++) {
-                    if (worldController.nextTetromino.grid[i][j]) {
-                        int x = (marginRightCenterX - (worldController.nextTetromino.grid[0].length / 2) * BLOCK_WIDTH) + (j * BLOCK_WIDTH);
+        if (tetrisController.nextTetromino != null && tetrisController.nextTetromino.type != 0) {
+            for (int i = 0; i < tetrisController.nextTetromino.grid.length; i++) {
+                for (int j = 0; j < tetrisController.nextTetromino.grid[0].length; j++) {
+                    if (tetrisController.nextTetromino.grid[i][j]) {
+                        int x = (marginRightCenterX - (tetrisController.nextTetromino.grid[0].length / 2) * BLOCK_WIDTH) + (j * BLOCK_WIDTH);
                         int y = FIELD_MARGIN_TOP + (i * BLOCK_WIDTH);
-                        drawBlock(worldController.nextTetromino.type, x, y);
+                        drawBlock(tetrisController.nextTetromino.type, x, y);
                     }
                 }
             }
@@ -294,13 +297,13 @@ public class WorldRenderer implements Disposable {
 
         //logIntArray(playfield, "playfield");
 
-        for (int i = 2; i < gameWorld.playfield.length; i++) {
-            for (int j = 0; j < gameWorld.playfield[0].length; j++) {
-                if (gameWorld.playfield[i][j] > 0) {
-                    int x = WorldRenderer.FIELD_MARGIN_LEFT + j * WorldRenderer.BLOCK_WIDTH;
-                    int y = WorldRenderer.FIELD_MARGIN_TOP + (i - 2) * WorldRenderer.BLOCK_WIDTH;
+        for (int i = 2; i < tetromanager.playfield.length; i++) {
+            for (int j = 0; j < tetromanager.playfield[0].length; j++) {
+                if (tetromanager.playfield[i][j] > 0) {
+                    int x = TetrisView.FIELD_MARGIN_LEFT + j * TetrisView.BLOCK_WIDTH;
+                    int y = TetrisView.FIELD_MARGIN_TOP + (i - 2) * TetrisView.BLOCK_WIDTH;
                     //Gdx.app.debug(TAG, "i = " + i);
-                    drawBlock(gameWorld.playfield[i][j], x, y);
+                    drawBlock(tetromanager.playfield[i][j], x, y);
                 }
             }
         }
@@ -310,25 +313,25 @@ public class WorldRenderer implements Disposable {
     private void drawBlock(int type, int x, int y) {
         switch (type) {
             case Tetromino.I:
-                batch.draw(Assets.instance.tetromino.elementCyanSquare, x, y, WorldRenderer.BLOCK_WIDTH, WorldRenderer.BLOCK_WIDTH);
+                batch.draw(Assets.instance.tetromino.elementCyanSquare, x, y, TetrisView.BLOCK_WIDTH, TetrisView.BLOCK_WIDTH);
                 break;
             case Tetromino.O:
-                batch.draw(Assets.instance.tetromino.elementYellowSquare, x, y, WorldRenderer.BLOCK_WIDTH, WorldRenderer.BLOCK_WIDTH);
+                batch.draw(Assets.instance.tetromino.elementYellowSquare, x, y, TetrisView.BLOCK_WIDTH, TetrisView.BLOCK_WIDTH);
                 break;
             case Tetromino.T:
-                batch.draw(Assets.instance.tetromino.elementPurpleSquare, x, y, WorldRenderer.BLOCK_WIDTH, WorldRenderer.BLOCK_WIDTH);
+                batch.draw(Assets.instance.tetromino.elementPurpleSquare, x, y, TetrisView.BLOCK_WIDTH, TetrisView.BLOCK_WIDTH);
                 break;
             case Tetromino.S:
-                batch.draw(Assets.instance.tetromino.elementGreenSquare, x, y, WorldRenderer.BLOCK_WIDTH, WorldRenderer.BLOCK_WIDTH);
+                batch.draw(Assets.instance.tetromino.elementGreenSquare, x, y, TetrisView.BLOCK_WIDTH, TetrisView.BLOCK_WIDTH);
                 break;
             case Tetromino.Z:
-                batch.draw(Assets.instance.tetromino.elementRedSquare, x, y, WorldRenderer.BLOCK_WIDTH, WorldRenderer.BLOCK_WIDTH);
+                batch.draw(Assets.instance.tetromino.elementRedSquare, x, y, TetrisView.BLOCK_WIDTH, TetrisView.BLOCK_WIDTH);
                 break;
             case Tetromino.J:
-                batch.draw(Assets.instance.tetromino.elementBlueSquare, x, y, WorldRenderer.BLOCK_WIDTH, WorldRenderer.BLOCK_WIDTH);
+                batch.draw(Assets.instance.tetromino.elementBlueSquare, x, y, TetrisView.BLOCK_WIDTH, TetrisView.BLOCK_WIDTH);
                 break;
             case Tetromino.L:
-                batch.draw(Assets.instance.tetromino.elementOrangeSquare, x, y, WorldRenderer.BLOCK_WIDTH, WorldRenderer.BLOCK_WIDTH);
+                batch.draw(Assets.instance.tetromino.elementOrangeSquare, x, y, TetrisView.BLOCK_WIDTH, TetrisView.BLOCK_WIDTH);
                 break;
         }
     }

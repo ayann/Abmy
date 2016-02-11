@@ -8,8 +8,8 @@ public class TetrisGame extends ApplicationAdapter {
 
     private static final String TAG = TetrisGame.class.getName();
 
-    private WorldController worldController;
-    protected WorldRenderer worldRenderer;
+    private TetrisController tetrisController;
+    protected TetrisView tetrisView;
 
     protected final float gameWidth = 400f;
     private final float gameHeight = 640f;
@@ -28,10 +28,10 @@ public class TetrisGame extends ApplicationAdapter {
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
 
-        GameWorld gameWorld = new GameWorld();
+        TetrominoManager tetromanager = new TetrominoManager();
 
-        worldController = new WorldController(this, gameWorld);
-        worldRenderer = new WorldRenderer(gameWorld, worldController, gameWidth, gameHeight);
+        tetrisController = new TetrisController(this, tetromanager);
+        tetrisView = new TetrisView(tetromanager, tetrisController, gameWidth, gameHeight);
 
         paused = false;
 
@@ -42,16 +42,16 @@ public class TetrisGame extends ApplicationAdapter {
         super.render();
 
         if (!paused) {
-            worldController.update();
+            tetrisController.update();
         }
 
-        worldRenderer.render();
+        tetrisView.render();
     }
 
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
-        worldRenderer.resize(width, height);
+        tetrisView.resize(width, height);
     }
 
     @Override
@@ -69,8 +69,8 @@ public class TetrisGame extends ApplicationAdapter {
     @Override
     public void dispose() {
         super.dispose();
-        worldRenderer.dispose();
-        worldController.dispose();
+        tetrisView.dispose();
+        tetrisController.dispose();
     }
 
 }
