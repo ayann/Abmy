@@ -63,14 +63,14 @@ public class WorldController {
 
         skinLibGdx = new Skin(Gdx.files.internal("images/uiskin.json"), new TextureAtlas("images/uiskin.atlas"));
 
-        winOptions = new Window("Nitris", skinLibGdx);
+        winOptions = new Window("ABMY", skinLibGdx);
 
         float width = Gdx.graphics.getWidth();
 
         winScaleFactor = (1/300f) * width - 1/3f;
 
         winOptions.setScale(winScaleFactor, winScaleFactor);
-        winOptions.add(buildInfoText());
+        // winOptions.add(buildInfoText());
         winOptions.row();
         winOptions.add(buildOptions());
         winOptions.pack();
