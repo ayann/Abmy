@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx;
 
 import java.util.Arrays;
 
-import com.tetris.abmy.GameWorld;
-import com.tetris.abmy.WorldController;
+import com.tetris.abmy.TetrominoManager;
+import com.tetris.abmy.TetrisController;
 
 /**
  * Created by team AMBY | Insta project on 11-02-16.
@@ -58,8 +58,8 @@ public class Tetromino {
 
     public int posX;
     public int posY;
-    private GameWorld gameWorld;
-    private WorldController worldController;
+    private TetrominoManager tetrominoManager;
+    private TetrisController tetrisController;
     public boolean moved;
 
     public boolean isFalling() {
@@ -72,9 +72,9 @@ public class Tetromino {
 
     public long lastFallTime;
 
-    public Tetromino(GameWorld gameWorld, WorldController worldController) {
-        this.gameWorld = gameWorld;
-        this.worldController = worldController;
+    public Tetromino(TetrominoManager tetrominoManager, TetrisController tetrisController) {
+        this.tetrominoManager = tetrominoManager;
+        this.tetrisController = tetrisController;
 
     }
 
@@ -82,8 +82,8 @@ public class Tetromino {
         this.type = type;
         this.falling = true;
 
-        //delay = 800 - (gameWorld.level * 33);
-        delay = (int) (800 * (Math.pow(.86, (double)gameWorld.level)));
+        //delay = 800 - (tetrominoManager.level * 33);
+        delay = (int) (800 * (Math.pow(.86, (double) tetrominoManager.level)));
         if (delay < 33) {
             delay = 33;
         }
@@ -119,8 +119,8 @@ public class Tetromino {
                 break;
         }
         //logBooleanArray(grid, "grid");
-        gameWorld.setTetrominoGrid(grid);
-        posX = gameWorld.playfield[0].length / 2 - grid[0].length / 2;
+        tetrominoManager.setTetrominoGrid(grid);
+        posX = tetrominoManager.playfield[0].length / 2 - grid[0].length / 2;
         if (grid[0].length < 4) posX--;
         posY = 0;
     }
@@ -136,9 +136,9 @@ public class Tetromino {
                     if (grid[i][j]) {
                         int blockRow = posY + i;
                         int blockCol = posX + j;
-                        if (blockRow >= gameWorld.blocks.length - 1) {
+                        if (blockRow >= tetrominoManager.blocks.length - 1) {
                             possible = false;
-                        } else if (gameWorld.blocks[blockRow + 1][blockCol]) {
+                        } else if (tetrominoManager.blocks[blockRow + 1][blockCol]) {
                             possible = false;
                         }
                     }
@@ -148,11 +148,11 @@ public class Tetromino {
                 posY++;
                 moved = true;
             } else {
-                //gameWorld.resetPositionTracking();
-                worldController.tetrominoSpawned = false;
+                //tetrominoManager.resetPositionTracking();
+                tetrisController.tetrominoSpawned = false;
                 falling = false;
                 if (posY == 0) {
-                    worldController.gameOver();
+                    tetrisController.gameOver();
                 }
             }
         }
@@ -168,9 +168,9 @@ public class Tetromino {
                 if (grid[i][j]) {
                     int blockRow = newPosY + i;
                     int blockCol = newPosX + j;
-                    if (blockRow >= gameWorld.blocks.length || blockCol < 0 || blockCol >= gameWorld.blocks[0].length) {
+                    if (blockRow >= tetrominoManager.blocks.length || blockCol < 0 || blockCol >= tetrominoManager.blocks[0].length) {
                         possible = false;
-                    } else if (gameWorld.blocks[blockRow][blockCol]) {
+                    } else if (tetrominoManager.blocks[blockRow][blockCol]) {
                         possible = false;
                     }
                 }
@@ -199,9 +199,9 @@ public class Tetromino {
                     if (rotatedGrid[i][j]) {
                         int blockRow = posY + i;
                         int blockCol = posX + j;
-                        if (blockRow >= gameWorld.blocks.length || blockCol < 0 || blockCol >= gameWorld.blocks[0].length) {
+                        if (blockRow >= tetrominoManager.blocks.length || blockCol < 0 || blockCol >= tetrominoManager.blocks[0].length) {
                             possible = false;
-                        } else if (gameWorld.blocks[blockRow][blockCol]) {
+                        } else if (tetrominoManager.blocks[blockRow][blockCol]) {
                             possible = false;
                         }
                     }
