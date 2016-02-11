@@ -50,7 +50,6 @@ public class TetrisController {
     }
 
     private void init() {
-        //TODO:
 
         prefs = Gdx.app.getPreferences("Nitris");
 
@@ -70,7 +69,6 @@ public class TetrisController {
         winScaleFactor = (1/300f) * width - 1/3f;
 
         winOptions.setScale(winScaleFactor, winScaleFactor);
-        // winOptions.add(buildInfoText());
         winOptions.row();
         winOptions.add(buildOptions());
         winOptions.pack();
@@ -115,29 +113,6 @@ public class TetrisController {
         return tbl;
     }
 
-    private Table buildInfoText() {
-        Table tbl = new Table();
-        Label lblText = new Label("Nitris by Pygmalion", skinLibGdx, "default-font", Color.WHITE);
-        tbl.add(lblText);
-        tbl.row();
-        Label lblUrl = new Label("pygmalion.nitri.de", skinLibGdx);
-        lblUrl.setColor(0, 0, 1, 1);
-        lblUrl.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.net.openURI("http://pygmalion.nitri.de");
-            }
-        });
-        tbl.add(lblUrl);
-        tbl.row();
-        if (Gdx.app.getType() != Application.ApplicationType.Android && Gdx.app.getType() != Application.ApplicationType.iOS) {
-            Label lblHelp = new Label("Use the arrow keys to move the piece ('up' to rotate right, 'down' to accelerate.)", skinLibGdx);
-            lblHelp.setWrap(true);
-            tbl.add(lblHelp).width(160f);
-            tbl.row();
-        }
-        return tbl;
-    }
 
     public void update() {
 

@@ -184,7 +184,7 @@ public class TetrisView implements Disposable {
 
         batch.begin();
 
-        batch.draw(new Texture(Gdx.files.internal("bg.jpg")),0, 0);
+        batch.draw(new Texture(Gdx.files.internal("bg.jpg")), 0, 0, gameWidth, gameHeight );
 
         renderPlayfield();
 
